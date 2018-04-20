@@ -1,0 +1,32 @@
+{
+  "name": "fs17_fieldinfos",
+  "version": "1.0.0",
+  "description": "The virtual assistant that will help you manage your fields.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TyKonKet/FS17_FieldInfos.git"
+  },
+  "author": "TyKonKet",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/TyKonKet/FS17_FieldInfos/issues"
+  },
+  "homepage": "https://github.com/TyKonKet/FS17_FieldInfos#readme",
+  "devDependencies": {
+    "del": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-run": "^1.7.1",
+    "gulp-series": "^1.0.2",
+    "gulp-size": "^2.1.0",
+    "gulp-util": "^3.0.8",
+    "gulp-zip": "^3.2.0",
+    "gulp-replace": "^0.6.1",
+    "vinyl-ftp": "^0.6.1",
+    "child_process": "^1.0.2",
+    "xmlbuilder": "^9.0.7",
+    "xml2js": "^0.4.19",
+    "bluebird": "^3.5.1",
+    "xml-escape": "^1.1.0",
+    "lodash": "^4.17.5"
+  }
+}

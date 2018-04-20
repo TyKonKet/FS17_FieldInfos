@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<modDesc descVersion="39">
+	<author>{package_author}</author>
+	<version>{package_version}</version>
+	<title>
+		<en>Field Infos</en>
+	</title>
+	<description>
+		<en>
+			<![CDATA[
+            The virtual assistant that will help you manage your fields.
+            ]]>
+		</en>
+	</description>
+	<iconFilename>icon.dds</iconFilename>
+	<multiplayer supported="true" />
+	<extraSourceFiles>
+		<sourceFile filename="fieldInfos.lua" />
+		<sourceFile filename="hud/hudManager.lua" />
+	</extraSourceFiles>
+	<l10n filenamePrefix="l10n/modDesc_l10n" />
+	<inputBindings>
+		<input name="FI_TOGGLE" category="ONFOOT" key1="KEY_i" device="1" visible="true" />
+	</inputBindings>
+</modDesc>
