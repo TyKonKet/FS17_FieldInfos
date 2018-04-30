@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+	<translationContributors>Ziuta</translationContributors>
+	<description>Wirtualny asystent, który pomoże ci zarządzać twoimi polami.</description>
+	<texts>
+		<text name="FI_SHOW" text="Pokaż informacje o polu"/>
+		<text name="FI_HIDE" text="Ukryj informacje o polu"/>
+	</texts>
+</l10n>
