@@ -4,6 +4,7 @@
 -- @author TyKonKet
 -- @date 10/07/2017
 FieldInfos = {}
+FieldInfos.dir = g_currentModDirectory
 FieldInfos.name = "FieldInfos"
 FieldInfos.debug = true
 
@@ -18,51 +19,12 @@ function FieldInfos:initialize(missionInfo, missionDynamicInfo, loadingScreen)
     self.fieldsMapTargetWidth, self.fieldsMapTargetHeight = 1024, 1024
     self.fieldsMapBits = 8
     self.fieldsMapMaxFields = 2 ^ self.fieldsMapBits - 1
-
-    self.hud = {}
-    local w = 250
-    local h = 300
-    local imageSize = {128, 128}
-    g_colorGreen = {0.2122, 0.5271, 0.0307, 1}
-
-    self.hud.bg = HudImage:new("HudBackground", g_baseUIFilename, 0.5, 0.5, w, h)
-    self.hud.bg:setAlignment(Hud.ALIGNS_VERTICAL_MIDDLE, Hud.ALIGNS_HORIZONTAL_CENTER)
-    self.hud.bg:setUVs(g_colorBgUVs)
-    self.hud.bg:setColor(g_colorBg)
-    self.hud.bg:addCallback(self, FieldInfos.onShowGui, Hud.CALLBACKS_SHOW_GUI)
-
-    self.hud.bgFrame = HudImage:new("HudBackgroundFrame", g_baseUIFilename, 0.5, 0.5, w + 30, h + 30, self.hud.bg)
-    self.hud.bgFrame:setAlignment(Hud.ALIGNS_VERTICAL_MIDDLE, Hud.ALIGNS_HORIZONTAL_CENTER)
-    self.hud.bgFrame:setUVs(g_colorBgUVs)
-    self.hud.bgFrame:setColor({0.013, 0.013, 0.013, 0.7})
-
-    self.hud.fTitleBg = HudImage:new("FieldTitleBg", g_baseUIFilename, 0.5, 301, w, 30, self.hud.bg)
-    self.hud.fTitleBg:setAlignment(Hud.ALIGNS_VERTICAL_TOP, Hud.ALIGNS_HORIZONTAL_CENTER)
-    self.hud.fTitleBg:setUVs(g_colorBgUVs)
-    self.hud.fTitleBg:setColor(g_colorGreen)
-
-    self.hud.fTitle = HudText:new("FieldTitle", "fieldJob_number", 20, 0.5, 0.55, true, self.hud.fTitleBg)
-    self.hud.fTitle:setAlignment(Hud.ALIGNS_VERTICAL_MIDDLE, Hud.ALIGNS_HORIZONTAL_CENTER)
-    self.hud.fTitle:setShadow(true, 1.2, 1.2, g_colorBg)
-
-    --self.hud.button = HudControlButton:new("BuySellButton", 0.5, 0, w, 30, "TEST BUTTON", 14, self.hud.bg);
-    --self.hud.button:setAlignment(Hud.ALIGNS_VERTICAL_BOTTOM, Hud.ALIGNS_HORIZONTAL_CENTER);
-    --self.hud.button:addCallback(self, FieldInfos.fc, Hud.CALLBACKS_MOUSE_CLICK);
-    self.hud.mainPaging = HudControlPaging:new("MainPaging", 0, 0, w, h - 30, self.hud.bg)
-    self.hud.mainPaging:addPage("Field Overview")
-    HudText:new("t", "test1", 20, 0.5, 0.5, false, self.hud.mainPaging.pages[1].page)
-    self.hud.mainPaging:addPage("Sowing")
-    HudText:new("t1", "test2", 20, 0.5, 0.5, false, self.hud.mainPaging.pages[2].page)
-    self.hud.mainPaging:addPage("Fertilization")
-    HudText:new("t2", "test3", 20, 0.5, 0.5, false, self.hud.mainPaging.pages[3].page)
-    self.hud.mainPaging:addPage("Harvest")
-    HudText:new("t3", "test4", 20, 0.5, 0.5, false, self.hud.mainPaging.pages[4].page)
+    self.fieldPanelShown = false
+    self.fieldPanel = FieldPanel:new()
+    g_gui:loadGui(self.dir .. "guis/fieldPanel.xml", "FieldPanel", self.fieldPanel)
+    FocusManager:setGui("MPLoadingScreen")
 end
 g_mpLoadingScreen.loadFunction = Utils.prependedFunction(g_mpLoadingScreen.loadFunction, FieldInfos.initialize)
-
-function FieldInfos:fc(hud, posX, posY, button)
-    self:print("FieldInfos.fc(hud:%s, posX:%s, posY:%s, button:%s)", hud, posX, posY, button)
-end
 
 function FieldInfos:load(missionInfo, missionDynamicInfo, loadingScreen)
     self = FieldInfos
@@ -75,8 +37,8 @@ g_mpLoadingScreen.loadFunction = Utils.appendedFunction(g_mpLoadingScreen.loadFu
 function FieldInfos:loadMap(name)
     self:print("loadMap(name:%s)", name)
     if self.debug then
-        addConsoleCommand("AAAGetFieldNumber", "", "AAAGetFieldNumber", self)
-        addConsoleCommand("AAAToggleFieldNumberDebug", "", "AAAToggleFieldNumberDebug", self)
+        addConsoleCommand("fiGetFieldNumber", "", "fiGetFieldNumber", self)
+        addConsoleCommand("fiToggleFieldNumberDebug", "", "fiToggleFieldNumberDebug", self)
     end
     self:loadSavegame()
 end
@@ -126,7 +88,6 @@ function FieldInfos:saveSavegame()
 end
 
 function FieldInfos:deleteMap()
-    self.hud.bg:delete(true)
 end
 
 function FieldInfos:keyEvent(unicode, sym, modifier, isDown)
@@ -140,23 +101,20 @@ function FieldInfos:update(dt)
         local x, _, z, _ = g_currentMission.player:getPositionData()
         local value = self:getFieldNumberAtWorldPos(x, z)
         if value ~= nil and value > 0 then
-            if self.hud.bg.visible then
+            if self.fieldPanelShown then
                 g_currentMission:addHelpButtonText(g_i18n:getText("FI_HIDE"), InputBinding.FI_TOGGLE)
                 if InputBinding.hasEvent(InputBinding.FI_TOGGLE) then
-                    self.hud.bg:setIsVisible(false, true)
-                    HudManager.setShowMouseCursor(false, g_currentMission.player)
+                    g_gui:showGui("")
+                    self.fieldPanelShown = false
                 end
             else
-                g_currentMission:addHelpButtonText(g_i18n:getText("FI_SHOW"), InputBinding.FI_TOGGLE)
+                g_currentMission:addHelpButtonText(string.format(g_i18n:getText("FI_SHOW"), value), InputBinding.FI_TOGGLE)
                 if InputBinding.hasEvent(InputBinding.FI_TOGGLE) then
                     self:setHudByField(self.fieldsDef.fieldDefsByFieldNumber[value])
-                    self.hud.bg:setIsVisible(true, true)
-                    HudManager.setShowMouseCursor(true, g_currentMission.player)
+                    g_gui:showGui("FieldPanel")
+                    self.fieldPanelShown = true
                 end
             end
-        elseif self.hud.bg.visible then
-            self.hud.bg:setIsVisible(false, true)
-            HudManager.setShowMouseCursor(false, g_currentMission.player)
         end
     end
 
@@ -223,7 +181,7 @@ end
 function FieldInfos:draw()
 end
 
-function FieldInfos:AAAGetFieldNumber()
+function FieldInfos:fiGetFieldNumber()
     if g_currentMission.player ~= nil then
         if self.fieldsMap ~= nil then
             local x, _, z, _ = g_currentMission.player:getPositionData()
@@ -237,7 +195,7 @@ function FieldInfos:AAAGetFieldNumber()
     end
 end
 
-function FieldInfos:AAAToggleFieldNumberDebug()
+function FieldInfos:fiToggleFieldNumberDebug()
     self.fieldNumberDebug = not self.fieldNumberDebug
     return "fieldNumberDebug = " .. tostring(self.fieldNumberDebug)
 end
@@ -264,14 +222,7 @@ function FieldInfos:convertWorldToFieldsMapPosition(x, z)
 end
 
 function FieldInfos:setHudByField(fieldDef)
-    self.hud.fTitle:setText(string.format(g_i18n:getText("fieldJob_number"), " n°" .. tostring(fieldDef.fieldNumber)))
-end
-
-function FieldInfos:onShowGui(hud, state, guiName, gui)
-    if state then
-    --hud:setIsVisible(false, true);
-    --HudManager.setShowMouseCursor(false, g_currentMission.player);
-    end
+    --self.hud.fTitle:setText(string.format(g_i18n:getText("fieldJob_number"), " n°" .. tostring(fieldDef.fieldNumber)))
 end
 
 addModEventListener(FieldInfos)

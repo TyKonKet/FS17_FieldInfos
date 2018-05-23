@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+	<translationContributors>TyKonKet</translationContributors>
+	<description>The virtual assistant that will help you manage your fields.</description>
+	<texts>
+		<text name="FI_SHOW" text="Visualizza informazioni del campo %s"/>
+		<text name="FI_HIDE" text="Nascondi informazioni del campo"/>
+	</texts>
+</l10n>

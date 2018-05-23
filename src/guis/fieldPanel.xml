@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GUI onOpen="onOpen" onClose="onClose" onCreate="onCreate">
+   <GuiElement type="empty" profile="newLayer" />
+   <GuiElement type="bitmap" profile="siloDialogBg" id="dialogElement">
+      <GuiElement type="bitmap" profile="siloDialogMainBg" id="dialogBgElement">
+         <GuiElement type="bitmap" profile="colorDialogHeader">
+            <GuiElement type="text" profile="headerText" text="$l10n_SM_NAME" id="dialogTitleElement" />
+         </GuiElement>
+      </GuiElement>
+   </GuiElement>
+</GUI>

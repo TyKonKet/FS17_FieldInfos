@@ -11,12 +11,27 @@
             The virtual assistant that will help you manage your fields.
             ]]>
 		</en>
+		<de>
+			<![CDATA[
+            The virtual assistant that will help you manage your fields.
+            ]]>
+		</de>
+		<fr>
+			<![CDATA[
+			L'assistant virtuel qui vous aidera à gérer vos champs.
+            ]]>
+		</fr>
+		<it>
+			<![CDATA[
+            Un assistente virtuale per gestire i tuoi campi.
+            ]]>
+		</it>
 	</description>
 	<iconFilename>icon.dds</iconFilename>
 	<multiplayer supported="true" />
 	<extraSourceFiles>
 		<sourceFile filename="fieldInfos.lua" />
-		<sourceFile filename="hud/hudManager.lua" />
+		<sourceFile filename="guis/fieldPanel.lua" />
 	</extraSourceFiles>
 	<l10n filenamePrefix="l10n/modDesc_l10n" />
 	<inputBindings>
